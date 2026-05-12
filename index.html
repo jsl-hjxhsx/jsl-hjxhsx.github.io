@@ -2,14 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Spin the Wheel - Random Picker</title>
+    
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7492383999446658" crossorigin="anonymous"></script>
     
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Spin the Wheel - Random Picker</title>
-    
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ultimate Spin the Wheel - Random Picker</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -32,7 +29,7 @@
         }
 
         /* ADVERTISING LAYOUT */
-        .ad-top { width: 100%; max-width: 970px; height: 90px; background: var(--glass); margin: 15px 0; border: 1px solid var(--primary); display: flex; align-items: center; justify-content: center; }
+        .ad-top { width: 100%; max-width: 970px; min-height: 90px; background: var(--glass); margin: 15px 0; border: 1px solid var(--primary); display: flex; align-items: center; justify-content: center; overflow: hidden; }
         
         .main-wrapper {
             display: flex;
@@ -50,8 +47,8 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            writing-mode: vertical-rl;
-            color: #555;
+            color: rgba(255,255,255,0.2);
+            font-size: 12px;
         }
 
         /* GAME UI */
@@ -133,17 +130,38 @@
             text-shadow: 0 0 10px var(--primary);
         }
 
+        /* CONTENT SECTION FOR ADSENSE */
+        .content-section {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            text-align: left;
+            line-height: 1.6;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
         @media (max-width: 900px) {
             .ad-side { display: none; }
+            .wheel-outer { width: 300px; height: 300px; }
         }
     </style>
 </head>
 <body>
 
-    <div class="ad-top">ADVERTISEMENT - LEADERBOARD (970x90)</div>
+    <div class="ad-top">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-7492383999446658"
+             data-ad-slot="auto"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
 
     <div class="main-wrapper">
-        <div class="ad-side">ADVERTISEMENT - SKYSCRAPER</div>
+        <div class="ad-side">AD SPACE</div>
 
         <div class="game-container">
             <h1>SPIN THE WHEEL</h1>
@@ -157,15 +175,30 @@
             <div id="result" class="result-popup"></div>
 
             <div style="margin-top: 20px;">
-                <h3 style="color: var(--primary);">Add Names Below:</h3>
-                <textarea id="namesList">You\nFriend 1\nFriend 2\nWinner\nLoser</textarea>
+                <h3 style="color: var(--primary);">Enter Names (one per line):</h3>
+                <textarea id="namesList">Team A\nTeam B\nTeam C\nTeam D\nWinner\nLoser</textarea>
             </div>
         </div>
 
-        <div class="ad-side">ADVERTISEMENT - SKYSCRAPER</div>
+        <div class="ad-side">AD SPACE</div>
     </div>
 
-    <div class="ad-top" style="height: 250px; margin-top: 20px;">ADVERTISEMENT - LARGE BANNER</div>
+    <div class="content-section">
+        <h2>About Random Name Picker</h2>
+        <p>Welcome to our professional <strong>Spin the Wheel</strong> tool. This random picker is designed for teachers, gamers, and event organizers who need a fair and fun way to select names, prizes, or winners. Our algorithm ensures every spin is 100% random and unbiased.</p>
+        <h3>How to use the wheel?</h3>
+        <p>Simply type your list into the text area. You can add names, numbers, or even chores. Press the SPIN button and watch the neon wheel decide! It's the perfect tool for classroom participation or deciding who goes first in a board game.</p>
+    </div>
+
+    <div class="ad-top" style="height: 250px; margin-top: 20px;">
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-7492383999446658"
+             data-ad-slot="auto"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
 
     <script>
         const canvas = document.getElementById('canvas');
@@ -177,7 +210,6 @@
         const colors = ["#00d2ff", "#e94560", "#f9ca24", "#6c5ce7", "#2ecc71", "#ff7979", "#f0932b", "#eb4d4b"];
         let startAngle = 0;
         let arc = 0;
-        let spinTimeout = null;
 
         function drawWheel() {
             const names = namesArea.value.split('\n').filter(n => n.trim() !== "");
@@ -206,6 +238,13 @@
         }
 
         spinBtn.onclick = () => {
+            const names = namesArea.value.split('\n').filter(n => n.trim() !== "");
+            if (names.length < 2) {
+                alert("Please enter at least 2 names!");
+                return;
+            }
+            
+            resultDiv.innerText = "Spinning...";
             let spinTime = 0;
             let spinTimeTotal = Math.random() * 3000 + 4000;
             let spinAngleStart = Math.random() * 10 + 10;
@@ -213,7 +252,6 @@
             function rotate() {
                 spinTime += 30;
                 if(spinTime >= spinTimeTotal) {
-                    const names = namesArea.value.split('\n').filter(n => n.trim() !== "");
                     let degrees = startAngle * 180 / Math.PI + 90;
                     let arcd = arc * 180 / Math.PI;
                     let index = Math.floor((360 - degrees % 360) / arcd);
