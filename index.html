@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ultimate Spin the Wheel - Random Picker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --secondary: #e94560;
+            --bg: #0f3460;
+            --dark: #1a1a2e;
+            --glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: radial-gradient(circle, var(--bg) 0%, var(--dark) 100%);
+            color: white;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* ADVERTISING LAYOUT */
+        .ad-top { width: 100%; max-width: 970px; height: 90px; background: var(--glass); margin: 15px 0; border: 1px solid var(--primary); display: flex; align-items: center; justify-content: center; }
+        
+        .main-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .ad-side {
+            width: 160px;
+            min-height: 600px;
+            background: var(--glass);
+            border: 1px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            writing-mode: vertical-rl;
+            color: #555;
+        }
+
+        /* GAME UI */
+        .game-container {
+            flex: 1;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .wheel-outer {
+            position: relative;
+            width: 380px;
+            height: 380px;
+            margin: 0 auto 30px;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 10px solid #16213e;
+            box-shadow: 0 0 30px var(--primary);
+        }
+
+        #pointer {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 50px;
+            background: #ffcc00;
+            clip-path: polygon(50% 100%, 0 0, 100% 0);
+            z-index: 10;
+        }
+
+        #spin-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            border: 5px solid var(--dark);
+            color: var(--dark);
+            font-weight: 800;
+            cursor: pointer;
+            z-index: 11;
+            transition: 0.2s;
+        }
+
+        #spin-btn:hover { transform: translate(-50%, -50%) scale(1.1); background: var(--primary); }
+
+        textarea {
+            width: 100%;
+            max-width: 400px;
+            height: 100px;
+            background: rgba(0,0,0,0.3);
+            color: white;
+            border: 2px solid var(--primary);
+            border-radius: 15px;
+            padding: 10px;
+            margin-top: 20px;
+            font-family: inherit;
+        }
+
+        .result-popup {
+            font-size: 28px;
+            color: var(--primary);
+            font-weight: bold;
+            margin-top: 15px;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        @media (max-width: 900px) {
+            .ad-side { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ad-top">ADVERTISEMENT - LEADERBOARD (970x90)</div>
+
+    <div class="main-wrapper">
+        <div class="ad-side">ADVERTISEMENT - SKYSCRAPER</div>
+
+        <div class="game-container">
+            <h1>SPIN THE WHEEL</h1>
+            
+            <div class="wheel-outer">
+                <div id="pointer"></div>
+                <canvas id="canvas" width="500" height="500"></canvas>
+                <button id="spin-btn">SPIN</button>
+            </div>
+
+            <div id="result" class="result-popup"></div>
+
+            <div style="margin-top: 20px;">
+                <h3 style="color: var(--primary);">Add Names Below:</h3>
+                <textarea id="namesList">You\nFriend 1\nFriend 2\nWinner\nLoser</textarea>
+            </div>
+        </div>
+
+        <div class="ad-side">ADVERTISEMENT - SKYSCRAPER</div>
+    </div>
+
+    <div class="ad-top" style="height: 250px; margin-top: 20px;">ADVERTISEMENT - LARGE BANNER</div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spin-btn');
+        const namesArea = document.getElementById('namesList');
+        const resultDiv = document.getElementById('result');
+
+        const colors = ["#00d2ff", "#e94560", "#f9ca24", "#6c5ce7", "#2ecc71", "#ff7979", "#f0932b", "#eb4d4b"];
+        let startAngle = 0;
+        let arc = 0;
+        let spinTimeout = null;
+
+        function drawWheel() {
+            const names = namesArea.value.split('\n').filter(n => n.trim() !== "");
+            if (names.length === 0) return;
+            arc = Math.PI / (names.length / 2);
+            ctx.clearRect(0,0,500,500);
+
+            names.forEach((name, i) => {
+                let angle = startAngle + i * arc;
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.beginPath();
+                ctx.arc(250, 250, 240, angle, angle + arc, false);
+                ctx.lineTo(250, 250);
+                ctx.fill();
+                ctx.strokeStyle = "rgba(255,255,255,0.1)";
+                ctx.stroke();
+
+                ctx.save();
+                ctx.fillStyle = "white";
+                ctx.translate(250 + Math.cos(angle + arc / 2) * 170, 250 + Math.sin(angle + arc / 2) * 170);
+                ctx.rotate(angle + arc / 2 + Math.PI / 2);
+                ctx.font = 'bold 18px Poppins';
+                ctx.fillText(name, -ctx.measureText(name).width / 2, 0);
+                ctx.restore();
+            });
+        }
+
+        spinBtn.onclick = () => {
+            let spinTime = 0;
+            let spinTimeTotal = Math.random() * 3000 + 4000;
+            let spinAngleStart = Math.random() * 10 + 10;
+            
+            function rotate() {
+                spinTime += 30;
+                if(spinTime >= spinTimeTotal) {
+                    const names = namesArea.value.split('\n').filter(n => n.trim() !== "");
+                    let degrees = startAngle * 180 / Math.PI + 90;
+                    let arcd = arc * 180 / Math.PI;
+                    let index = Math.floor((360 - degrees % 360) / arcd);
+                    resultDiv.innerText = "⭐ " + names[index] + " ⭐";
+                    return;
+                }
+                let spinAngle = spinAngleStart - (spinTime / spinTimeTotal) * spinAngleStart;
+                startAngle += (spinAngle * Math.PI / 180);
+                drawWheel();
+                setTimeout(rotate, 30);
+            }
+            rotate();
+        };
+
+        namesArea.addEventListener('input', drawWheel);
+        drawWheel();
+    </script>
+</body>
+</html>
